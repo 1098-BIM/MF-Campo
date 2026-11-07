@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14325c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MF Campo">
+<title>MF Campo</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<section id="v-login" class="login" hidden>
+  <div class="login-box">
+    <div class="brand-big">MF CAMPO</div>
+    <div class="eyebrow">Minerbo-Fuchs · gerenciamento de obra</div>
+    <form id="f-login">
+      <div class="field"><label for="l-email">E-mail corporativo</label><input id="l-email" type="email" autocomplete="username" required placeholder="nome@minerbo-fuchs.com.br"></div>
+      <div class="field"><label for="l-senha">Senha</label><input id="l-senha" type="password" autocomplete="current-password" required></div>
+      <button class="primary" type="submit" id="l-entrar">Entrar</button>
+      <button class="ghost" type="button" id="l-esqueci">Esqueci minha senha</button>
+      <div class="status-msg" id="l-msg" aria-live="polite"></div>
+    </form>
+    <div class="note">Acesso restrito à equipe convidada. Peça o convite ao Departamento BIM.</div>
+  </div>
+</section>
+
+<!-- ===== NOVA SENHA (link do e-mail) ===== -->
+<section id="v-senha" class="login" hidden>
+  <div class="login-box">
+    <div class="brand-big">MF CAMPO</div>
+    <h2>Definir nova senha</h2>
+    <form id="f-senha">
+      <div class="field"><label for="s-senha">Nova senha (mínimo 8 caracteres)</label><input id="s-senha" type="password" autocomplete="new-password" minlength="8" required></div>
+      <button class="primary" type="submit">Salvar senha</button>
+      <div class="status-msg" id="s-msg" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+
+<!-- ===== APP ===== -->
+<div id="app" hidden>
+<header class="top">
+  <div class="brand">MF CAMPO <small id="usuario"></small></div>
+  <nav class="tabs" id="tabs">
+    <a href="#campo" data-v="campo">Campo</a>
+    <a href="#painel" data-v="painel">Painel</a>
+    <a href="#relatorio" data-v="relatorio">Relatório</a>
+  </nav>
+  <button class="sm ghost topbtn" id="sair" type="button" title="Sair">Sair</button>
+</header>
+<div id="offline" class="banner" hidden>Sem conexão — os registros ficam guardados no aparelho e são enviados quando a internet voltar. <span id="pendentes"></span></div>
+
+<main>
+<!-- ===== CAMPO ===== -->
+<section id="v-campo" class="narrow">
+  <div class="eyebrow">Nova incompatibilidade</div>
+  <h1>Registro em obra</h1>
+  <form class="card" id="f">
+    <div class="row">
+      <div class="field"><label for="obra">Obra / ON</label><input id="obra" list="obras-dl" placeholder="ex.: ON 1183 – HIAE" required autocomplete="off"><datalist id="obras-dl"></datalist></div>
+      <div class="field"><label for="local">Local</label><input id="local" placeholder="Pav. 3 · Eixo C/7 · Shaft" required></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="disc">Disciplina</label><select id="disc"></select></div>
+      <div class="field"><label for="prio">Prioridade</label>
+        <select id="prio"><option value="baixa">Baixa</option><option value="media" selected>Média</option><option value="alta">Alta</option></select></div>
+    </div>
+    <div class="field"><label for="titulo">Título curto</label><input id="titulo" placeholder="Duto HVAC colide com viga V-23" required></div>
+    <div class="field"><label for="desc">Descrição (opcional — pode usar só o áudio)</label><textarea id="desc" placeholder="O que foi encontrado, o que o projeto previa, o que se propõe."></textarea></div>
+
+    <div class="field"><label>Evidências</label>
+      <div class="capture">
+        <label class="btn" for="foto"><span class="ic">📷</span>Tirar foto<input id="foto" type="file" accept="image/*" capture="environment"></label>
+        <label class="btn" for="galeria"><span class="ic">🖼</span>Da galeria<input id="galeria" type="file" accept="image/*" multiple></label>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="rec-wrap">
+        <button type="button" class="rec-btn" id="btnGravar"><span class="ic">🎙</span><span id="gravTxt">Segure para gravar áudio</span></button>
+        <div class="rec-meter" id="recMeter" hidden><span class="dot"></span><span id="recTempo">0:00</span> gravando… solte para parar</div>
+      </div>
+      <div class="audiolist" id="audios"></div>
+      <div class="note" id="capnote">Segure o botão e fale, como no WhatsApp. Solte para parar. Pode gravar mais de um áudio.</div>
+    </div>
+
+    <label class="chk"><input type="checkbox" id="gps" checked> Anexar localização GPS</label>
+    <button class="primary" id="salvar" type="submit">Registrar incompatibilidade</button>
+    <div class="status-msg" id="msg" aria-live="polite"></div>
+  </form>
+
+  <div class="sec">
+    <div class="eyebrow">Meus últimos registros</div>
+    <div id="meus" class="grid one"></div>
+  </div>
+</section>
+
+<!-- ===== PAINEL ===== -->
+<section id="v-painel" hidden>
+  <div class="eyebrow">Gestão</div>
+  <h1>Painel de incompatibilidades</h1>
+  <div class="filters">
+    <select id="fObra"><option value="">Todas as obras</option></select>
+    <select id="fDisc"><option value="">Todas as disciplinas</option></select>
+    <select id="fStatus"><option value="">Todos os status</option><option value="aberta">Aberta</option><option value="analise">Em análise</option><option value="resolvida">Resolvida</option></select>
+    <select id="fPrio"><option value="">Todas as prioridades</option><option value="alta">Alta</option><option value="media">Média</option><option value="baixa">Baixa</option></select>
+    <input id="fTexto" placeholder="Buscar texto…">
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="grid" id="lista"></div>
+</section>
+
+<!-- ===== RELATÓRIO ===== -->
+<section id="v-relatorio" hidden>
+  <div class="toolbar">
+    <select id="rObra"><option value="">Todas as obras</option></select>
+    <select id="rStatus"><option value="">Todos os status</option><option value="aberta">Só abertas</option><option value="analise">Só em análise</option><option value="resolvida">Só resolvidas</option></select>
+    <input id="rDe" type="date" title="De">
+    <input id="rAte" type="date" title="Até">
+    <button id="btnImprimir" type="button">Imprimir / salvar PDF</button>
+    <button id="btnCopiar" type="button">Copiar texto</button>
+  </div>
+  <div class="field" style="max-width:820px;margin:0 auto 12px"><label for="rResumo">Resumo executivo (opcional; entra no topo do relatório)</label><textarea id="rResumo" placeholder="Panorama geral, disciplinas mais afetadas, itens críticos, próximos passos."></textarea></div>
+  <div class="rel" id="rel"></div>
+</section>
+</main>
+</div>
+
+<div id="lightbox" class="lightbox" hidden><img alt=""></div>
+
+<script src="config.js"></script>
+<script src="supabase.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

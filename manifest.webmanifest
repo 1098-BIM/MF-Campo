@@ -1,0 +1,16 @@
+{
+  "name": "MF Campo",
+  "short_name": "MF Campo",
+  "description": "Registro de incompatibilidades em obra — Minerbo-Fuchs Engenharia",
+  "start_url": "./#campo",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f4ef",
+  "theme_color": "#14325c",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
